@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="UTF-8">
+    <title>Preguntale lo que quieras a Rodolfo!</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" type="text/css" href="https://bootswatch.com/4/cerulean/bootstrap.min.css">
+</head>
+
+<body style="padding:50px;">
+    <h1>Preguntale lo que quieras a Rodolfo!</h1>
+    <div id="controls">
+        <button id="recordButton">Grabar audio</button>
+        <button id="transcribeButton" disabled>Parar y reproducir respuesta</button>
+    </div>
+    <br/>
+    <br/>
+    <div><strong id="question"></strong></div><hr/>
+    <div id="output"></div>
+    <script src="https://cdn.rawgit.com/mattdiamond/Recorderjs/08e7abd9/dist/recorder.js"></script>
+    <!-- <script defer src="src/renderer.ts"></script> -->
+  </body>
+</html>

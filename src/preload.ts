@@ -83,59 +83,64 @@ window.addEventListener("DOMContentLoaded", () => {
     transcript(blob);
   }
 
+   async function transcript(blob: Blob) {
 
+    let transcript = await transcriptSpeech(blob);
+    let text = await answerQuestion(transcript);
+    createSpeech(text);
 
-  async function transcript(blob: Blob) {
+  }
 
-    //   // Obtén los datos de audio del Blob
-    //   let arrayBuffer = await blob.arrayBuffer();
-    //   // Asegurémonos de que la longitud sea múltiplo de 4
-    //   const dataView = new DataView(arrayBuffer);
-    //   const originalLength = dataView.byteLength;
-    //   const padding = 4 - (originalLength % 4);
-    //   if (padding !== 4) {
-    //     const paddedArrayBuffer = new ArrayBuffer(originalLength + padding);
-    //     const paddedDataView = new DataView(paddedArrayBuffer);
-    //     for (let i = 0; i < originalLength; i++) {
-    //       paddedDataView.setUint8(i, dataView.getUint8(i));
-    //     }
-    //     arrayBuffer = paddedArrayBuffer;
+  async function transcriptSpeech(blob: Blob) {
+
+    // // Obtén los datos de audio del Blob
+    // let arrayBuffer = await blob.arrayBuffer();
+    // // Asegurémonos de que la longitud sea múltiplo de 4
+    // const dataView = new DataView(arrayBuffer);
+    // const originalLength = dataView.byteLength;
+    // const padding = 4 - (originalLength % 4);
+    // if (padding !== 4) {
+    //   const paddedArrayBuffer = new ArrayBuffer(originalLength + padding);
+    //   const paddedDataView = new DataView(paddedArrayBuffer);
+    //   for (let i = 0; i < originalLength; i++) {
+    //     paddedDataView.setUint8(i, dataView.getUint8(i));
     //   }
+    //   arrayBuffer = paddedArrayBuffer;
+    // }
 
-    //   const audioData: WavEncoder.AudioData = {
-    //     sampleRate: 44100,
-    //     channelData: [new Float32Array(arrayBuffer)],
-    //   };
+    // const audioData: WavEncoder.AudioData = {
+    //   sampleRate: 44100,
+    //   channelData: [new Float32Array(arrayBuffer)],
+    // };
 
-    //   // Agrega un encabezado WAV
-    //   let wavData = null;
-    //   await WavEncoder.encode(audioData).then((buffer) => {
-    //     wavData = buffer;
-    //   });
+    // // Agrega un encabezado WAV
+    // let wavData = null;
+    // await WavEncoder.encode(audioData).then((buffer) => {
+    //   wavData = buffer;
+    // });
 
-    //   const wavBlob = new Blob([wavData], { type: 'audio/wav' });
+    // const wavBlob = new Blob([wavData], { type: 'audio/wav' });
 
-    //   // Microsoft ---------------------------------------------------------------------------------------------------------------------
-
-
-    //   let audioConfig = AudioConfig.fromWavFileInput(new File([wavBlob], 'audio.wav'));
-    //   let speechRecognizer = new SpeechRecognizer(speechConfig, audioConfig);
+    // // Microsoft ---------------------------------------------------------------------------------------------------------------------
+    // let audioConfig = AudioConfig.fromWavFileInput(new File([wavBlob], 'audio.wav'));
+    // let speechRecognizer = new SpeechRecognizer(speechConfig, audioConfig);
 
     // //  play2(blob);
-    //   let transcript = "Hola";
+    // let transcript = "Hola";
 
-    //   await speechRecognizer.recognizeOnceAsync((result) => {
-    //     speechRecognizer.close();
-    //     console.log(result);
-    //     transcript = result.text;
-    //     console.log(transcript);
+    // await speechRecognizer.recognizeOnceAsync((result) => {
+    //   speechRecognizer.close();
+    //   console.log(result);
+    //   transcript = result.text;
+    //   console.log(transcript);
 
-    //   }, (err) => {
+    // }, (err) => {
 
-    //     console.log(err);
-    //   });
+    //   console.log(err);
+    // });
 
-    //   document.getElementById("question").innerHTML = transcript;
+    // document.getElementById("question").innerHTML = transcript;
+    // return transcript;
 
     // OpenAi ------------------------------------------------------------------------------------------------------------------------
     const transcriptG = await openaiApi.audio.transcriptions.create({
@@ -145,7 +150,11 @@ window.addEventListener("DOMContentLoaded", () => {
 
     let transcript = transcriptG.text;
     document.getElementById("question").innerHTML = transcript;
+    return transcript;
 
+  }
+
+  async function answerQuestion(transcript: string) {
 
     // OpenAi ------------------------------------------------------------------------------------------------------------------------
     const completion = await openaiApi.completions.create({
@@ -159,31 +168,15 @@ window.addEventListener("DOMContentLoaded", () => {
     });
 
     document.getElementById("output").innerHTML = completion.choices[0].text;
-    // // Google ------------------------------------------------------------------------------------------------------------------------
-    // const request = {
-    //   audioConfig: {
-    //     audioEncoding: google.cloud.texttospeech.v1.AudioEncoding.MP3,
-    //     effectsProfileId: ["headphone-class-device"],
-    //     pitch: 0,
-    //     speakingRate: 1,
-    //   },
-    //   input: { text: completion.choices[0].text },
-    //   voice: {
-    //     languageCode: "es-US",
-    //     name: "es-US-Studio-B",
-    //   },
-    // };
+    return completion.choices[0].text;
+  }
 
-    // // Performs the text-to-speech request
-    // const response: any = await gtts.synthesizeSpeech(request);
-    // console.log(response);
-
-
+  async function createSpeech(text: string) {
     // microsoft ------------------------------------------------------------------------------------------------------------------------
     // Create the speech synthesizer.
     var synthesizer = new SpeechSynthesizer(speechConfig);
     // Start the synthesizer and wait for a result.
-    const response: any = synthesizer.speakTextAsync(completion.choices[0].text,
+    const response: any = synthesizer.speakTextAsync(text,
       function (result) {
         if (result.reason === ResultReason.SynthesizingAudioCompleted) {
           console.log("synthesis finished.");
@@ -200,9 +193,29 @@ window.addEventListener("DOMContentLoaded", () => {
         synthesizer = null;
       });
     play(response);
-  }
 
-  // Reproducir el audio sintetizado
+    // // Google ------------------------------------------------------------------------------------------------------------------------
+    // const request = {
+    //   audioConfig: {
+    //     audioEncoding: google.cloud.texttospeech.v1.AudioEncoding.MP3,
+    //     effectsProfileId: ["headphone-class-device"],
+    //     pitch: 0,
+    //     speakingRate: 1,
+    //   },
+    //   input: { text: text },
+    //   voice: {
+    //     languageCode: "es-US",
+    //     name: "es-US-Studio-B",
+    //   },
+    // };
+
+    // // Performs the text-to-speech request
+    // const response: any = await gtts.synthesizeSpeech(request);
+    // console.log(response);
+    // play(response);
+
+  }
+  
   function play(audioContent: Uint8Array) {
     const blob = new Blob([audioContent], { type: 'audio/mp3' });
     const audioUrl = URL.createObjectURL(blob);
@@ -215,6 +228,5 @@ window.addEventListener("DOMContentLoaded", () => {
     const audio = new Audio(audioUrl);
     audio.play();
   }
-
 
 });

@@ -1,11 +1,11 @@
 import { OpenAI } from "openai";
 //import { TextToSpeechClient } from "@google-cloud/text-to-speech";
 //import { google } from "@google-cloud/text-to-speech/build/protos/protos";
-import * as WavEncoder from "wav-encoder";
-import { AudioConfig, ResultReason, SpeechConfig, SpeechRecognizer, SpeechSynthesizer } from "microsoft-cognitiveservices-speech-sdk";
+import { AudioConfig, CancellationDetails, CancellationReason, NoMatchDetails, ResultReason, SpeechConfig, SpeechRecognizer, SpeechSynthesizer } from "microsoft-cognitiveservices-speech-sdk";
 import * as path from "path";
-//import * as fs from "fs";
+//import { readFileSync, writeFileSync } from 'fs';
 //import * as util from "util";
+
 //import * as readline from "readline";
 
 window.addEventListener("DOMContentLoaded", () => {
@@ -29,13 +29,10 @@ window.addEventListener("DOMContentLoaded", () => {
   let clicked: Boolean = false;
 
   const recordButton = document.getElementById("recordButton") as HTMLButtonElement;
-  // const transcribeButton = document.getElementById("transcribeButton") as HTMLButtonElement;
-
-
+  
   recordButton.addEventListener("mousedown", start);
   recordButton.addEventListener("mouseup", stop);
   recordButton.addEventListener("mouseleave", stop);
-
 
   function start() {
     clicked = true;
@@ -49,34 +46,25 @@ window.addEventListener("DOMContentLoaded", () => {
       transcribeText();
     }
   }
-  // transcribeButton.addEventListener("click", transcribeText);
 
   function startRecording() {
     const constraints: MediaStreamConstraints = { audio: true, video: false };
 
-    // recordButton.disabled = true;
-    // transcribeButton.disabled = false;
-
     navigator.mediaDevices.getUserMedia(constraints)
       .then(function (stream) {
-        //const audioContext = new AudioContext();
         audioStream = stream;
-        //const input = audioContext.createMediaStreamSource(stream);
         rec = new MediaRecorder(stream);
         rec.start();
 
         document.getElementById("output").innerHTML = "Recording started...";
       })
       .catch(function (err) {
-        //  recordButton.disabled = false;
-        //     transcribeButton.disabled = true;
+        console.log(err);
       });
   }
 
   function transcribeText() {
     document.getElementById("output").innerHTML = "Converting audio to text...";
-    // transcribeButton.disabled = true;
-    //  recordButton.disabled = false;
 
     if (rec) {
       rec.stop();
@@ -107,8 +95,8 @@ window.addEventListener("DOMContentLoaded", () => {
 
   async function transcriptSpeech(blob: Blob) {
 
-    // // Obtén los datos de audio del Blob
-    // let arrayBuffer = await blob.arrayBuffer();
+    // Obtén los datos de audio del Blob
+    //let arrayBuffer = new Uint8Array(await blob.arrayBuffer());
     // // Asegurémonos de que la longitud sea múltiplo de 4
     // const dataView = new DataView(arrayBuffer);
     // const originalLength = dataView.byteLength;
@@ -120,33 +108,52 @@ window.addEventListener("DOMContentLoaded", () => {
     //     paddedDataView.setUint8(i, dataView.getUint8(i));
     //   }
     //   arrayBuffer = paddedArrayBuffer;
-    // }
+    //
 
-    // const audioData: WavEncoder.AudioData = {
+    // const audioData: AudioData = {
     //   sampleRate: 44100,
     //   channelData: [new Float32Array(arrayBuffer)],
     // };
 
     // // Agrega un encabezado WAV
     // let wavData = null;
-    // await WavEncoder.encode(audioData).then((buffer) => {
+    // await encode(audioData).then((buffer) => {
     //   wavData = buffer;
     // });
 
-    // const wavBlob = new Blob([wavData], { type: 'audio/wav' });
+   // let wav = new WaveFile(arrayBuffer);
 
+
+    // const wavBlob = new Blob([wavData], { type: 'audio/wav' });
+    // play2(wavBlob);
     // // Microsoft ---------------------------------------------------------------------------------------------------------------------
-    // let audioConfig = AudioConfig.fromWavFileInput(new File([wavBlob], 'audio.wav'));
+    // let audioConfig = AudioConfig.fromWavFileInput(new File([blob], 'audio.wav'));
     // let speechRecognizer = new SpeechRecognizer(speechConfig, audioConfig);
 
-    // //  play2(blob);
     // let transcript = "Hola";
 
-    // await speechRecognizer.recognizeOnceAsync((result) => {
+    // speechRecognizer.recognizeOnceAsync(result => {
+    //   switch (result.reason) {
+    //     case ResultReason.RecognizedSpeech:
+    //       console.log(`RECOGNIZED: Text=${result.text}`);
+    //       break;
+    //     case ResultReason.NoMatch:
+    //       const details = NoMatchDetails.fromResult(result);
+    //       console.log(`CANCELED: Reason=${details.reason}`);
+    //       console.log("NOMATCH: Speech could not be recognized.");
+    //       break;
+    //     case ResultReason.Canceled:
+    //       const cancellation = CancellationDetails.fromResult(result);
+    //       console.log(`CANCELED: Reason=${cancellation.reason}`);
+
+    //       if (cancellation.reason == CancellationReason.Error) {
+    //         console.log(`CANCELED: ErrorCode=${cancellation.ErrorCode}`);
+    //         console.log(`CANCELED: ErrorDetails=${cancellation.errorDetails}`);
+    //         console.log("CANCELED: Did you set the speech resource key and region values?");
+    //       }
+    //       break;
+    //   }
     //   speechRecognizer.close();
-    //   console.log(result);
-    //   transcript = result.text;
-    //   console.log(transcript);
 
     // }, (err) => {
 
@@ -190,7 +197,7 @@ window.addEventListener("DOMContentLoaded", () => {
     // Create the speech synthesizer.
     var synthesizer = new SpeechSynthesizer(speechConfig);
     // Start the synthesizer and wait for a result.
-    const response: any = synthesizer.speakTextAsync(text,
+    synthesizer.speakTextAsync(text,
       function (result) {
         if (result.reason === ResultReason.SynthesizingAudioCompleted) {
           console.log("synthesis finished.");
@@ -206,7 +213,6 @@ window.addEventListener("DOMContentLoaded", () => {
         synthesizer.close();
         synthesizer = null;
       });
-    play(response);
 
     // // Google ------------------------------------------------------------------------------------------------------------------------
     // const request = {
@@ -230,12 +236,12 @@ window.addEventListener("DOMContentLoaded", () => {
 
   }
 
-  function play(audioContent: Uint8Array) {
-    const blob = new Blob([audioContent], { type: 'audio/mp3' });
-    const audioUrl = URL.createObjectURL(blob);
-    const audio = new Audio(audioUrl);
-    audio.play();
-  }
+  // function play(audioContent: Uint8Array) {
+  //   const blob = new Blob([audioContent], { type: 'audio/mp3' });
+  //   const audioUrl = URL.createObjectURL(blob);
+  //   const audio = new Audio(audioUrl);
+  //   audio.play();
+  // }
 
   function play2(audioContent: Blob) {
     const audioUrl = URL.createObjectURL(audioContent);

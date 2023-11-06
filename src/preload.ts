@@ -26,18 +26,36 @@ window.addEventListener("DOMContentLoaded", () => {
 
   let rec: MediaRecorder | null = null;
   let audioStream: MediaStream | null = null;
+  let clicked: Boolean = false;
 
   const recordButton = document.getElementById("recordButton") as HTMLButtonElement;
-  const transcribeButton = document.getElementById("transcribeButton") as HTMLButtonElement;
+  // const transcribeButton = document.getElementById("transcribeButton") as HTMLButtonElement;
 
-  recordButton.addEventListener("click", startRecording);
-  transcribeButton.addEventListener("click", transcribeText);
+
+  recordButton.addEventListener("mousedown", start);
+  recordButton.addEventListener("mouseup", stop);
+  recordButton.addEventListener("mouseleave", stop);
+
+
+  function start() {
+    clicked = true;
+    startRecording();
+  }
+
+  function stop() {
+
+    if (clicked) {
+      clicked = false;
+      transcribeText();
+    }
+  }
+  // transcribeButton.addEventListener("click", transcribeText);
 
   function startRecording() {
     const constraints: MediaStreamConstraints = { audio: true, video: false };
 
-    recordButton.disabled = true;
-    transcribeButton.disabled = false;
+    // recordButton.disabled = true;
+    // transcribeButton.disabled = false;
 
     navigator.mediaDevices.getUserMedia(constraints)
       .then(function (stream) {
@@ -50,15 +68,15 @@ window.addEventListener("DOMContentLoaded", () => {
         document.getElementById("output").innerHTML = "Recording started...";
       })
       .catch(function (err) {
-        recordButton.disabled = false;
-        transcribeButton.disabled = true;
+        //  recordButton.disabled = false;
+        //     transcribeButton.disabled = true;
       });
   }
 
   function transcribeText() {
     document.getElementById("output").innerHTML = "Converting audio to text...";
-    transcribeButton.disabled = true;
-    recordButton.disabled = false;
+    // transcribeButton.disabled = true;
+    //  recordButton.disabled = false;
 
     if (rec) {
       rec.stop();
@@ -74,16 +92,12 @@ window.addEventListener("DOMContentLoaded", () => {
     if (rec) {
       rec.ondataavailable = (event) => {
         const blob = new Blob([event.data], { type: "audio/wav" });
-        uploadSoundData(blob);
+        transcript(blob);
       };
     }
   }
 
-  function uploadSoundData(blob: Blob) {
-    transcript(blob);
-  }
-
-   async function transcript(blob: Blob) {
+  async function transcript(blob: Blob) {
 
     let transcript = await transcriptSpeech(blob);
     let text = await answerQuestion(transcript);
@@ -215,7 +229,7 @@ window.addEventListener("DOMContentLoaded", () => {
     // play(response);
 
   }
-  
+
   function play(audioContent: Uint8Array) {
     const blob = new Blob([audioContent], { type: 'audio/mp3' });
     const audioUrl = URL.createObjectURL(blob);

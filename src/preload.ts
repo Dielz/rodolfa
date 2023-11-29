@@ -180,7 +180,8 @@ window.addEventListener("DOMContentLoaded", () => {
     // OpenAi ------------------------------------------------------------------------------------------------------------------------
     const completion = await openaiApi.completions.create({
       model: 'gpt-3.5-turbo-instruct',
-      prompt: `Que tu respuesta sea breve y corta y evita usar códigos o caracteres ilegibles o iconos, que todas tus respuestas estén orientadas a la navidad y en caso de no poder orientarla a la navidad o un tema relacionado a la navidad, responde con "No puedo responder temas no relacionados con la navidad, pero sí te puedo dar un dato navideño" y procedes a dar un dato sobre la navidad.  "${transcript}"`,
+     // prompt: `Que tu respuesta sea breve y corta y evita usar códigos o caracteres ilegibles o iconos, que todas tus respuestas estén orientadas a la navidad y en caso de no poder orientarla a la navidad o un tema relacionado a la navidad, responde con "No puedo responder temas no relacionados con la navidad, pero sí te puedo dar un dato navideño" y procedes a dar un dato sobre la navidad.  "${transcript}"`,
+      prompt: `Actua como un experto en temas navideños, quiero que tu respuesta sea breve y corta, tu vas a responder solo preguntas relacionadas con la época navideña, en caso de no tener una repuesta, orienta tu repuesta con una tematica navideña explicando amablemente que solo sabes hablar sobre temas relacionados a la epoca navideña y en el proceso proporcionar un dato interesante sobre la Navidad, devuelveme el resultado en texto plano.  "${transcript}"`,
       temperature: 0.7,
       max_tokens: 256,
       top_p: 1,

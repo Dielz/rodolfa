@@ -1,25 +1,331 @@
 <!DOCTYPE html>
 <html>
-
-<head>
-    <meta charset="UTF-8">
+  <head>
+    <meta charset="UTF-8" />
     <title>Preguntale lo que quieras a Rodolfo!</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" type="text/css" href="https://bootswatch.com/4/cerulean/bootstrap.min.css">
-    <link rel="stylesheet" type="text/css" href="style.css">
-</head>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link
+      rel="stylesheet"
+      type="text/css"
+      href="https://bootswatch.com/4/cerulean/bootstrap.min.css"
+    />
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+      integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN"
+      crossorigin="anonymous"
+    />
+    <link rel="stylesheet" type="text/css" href="style.css" />
+    <!-- gooogle fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Open+Sans&display=swap"
+      rel="stylesheet"
+    />
+    <!---- Font Awesome Cdn Linkage ------>
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css"
+    />
+  </head>
 
-<body style="padding:50px;">
-    <h1>Preguntale lo que quieras a Rodolfo!</h1>
-    <div id="controls">
-        <button id="recordButton">Grabar audio</button>
-        <!-- <button id="transcribeButton" disabled>Parar y reproducir respuesta</button> -->
+  <body style="z-index: 1">
+    <div class="container-md text-center">
+      <div class="row">
+        <div class="col-md-12 justify-content-center">
+          <!-- Merry christmas words -->
+
+          <div class="anim-container" id="container">
+            <div class="hbox align-center">
+              <div class="lights vbox">
+                <h1>Merry Christmas!</h1>
+                <svg
+                  width="732px"
+                  height="75px"
+                  viewBox="114 88 732 82"
+                  version="1.1"
+                  xmlns="http://www.w3.org/2000/svg"
+                  xmlns:xlink="http://www.w3.org/1999/xlink"
+                >
+                  <defs></defs>
+                  <filter
+                    id="glow"
+                    width="200%"
+                    height="200%"
+                    filterUnits="userSpaceOnUse"
+                  >
+                    <feGaussianBlur stdDeviation="12.5" result="coloredBlur" />
+                    <feMerge>
+                      <feMergeNode in="coloredBlur" />
+                      <feMergeNode in="SourceGraphic" />
+                    </feMerge>
+                  </filter>
+                  <g
+                    id="Light1"
+                    stroke="none"
+                    stroke-width="1"
+                    fill="none"
+                    fill-rule="evenodd"
+                    transform="translate(129.000000, 117.000000) rotate(9.000000) translate(-129.000000, -117.000000) translate(119.000000, 89.000000)"
+                  >
+                    <ellipse
+                      class="light"
+                      id="Oval"
+                      fill="#FF3E3E"
+                      cx="10"
+                      cy="37.5"
+                      rx="10"
+                      ry="18.5"
+                    ></ellipse>
+                    <rect
+                      id="Rectangle"
+                      fill="#496E4C"
+                      x="2"
+                      y="-5.68434189e-14"
+                      width="16"
+                      height="22"
+                      rx="4"
+                    ></rect>
+                  </g>
+                  <g
+                    id="Light1-Copy"
+                    stroke="none"
+                    stroke-width="1"
+                    fill="none"
+                    fill-rule="evenodd"
+                    transform="translate(229.000000, 117.000000) rotate(-9.000000) translate(-229.000000, -117.000000) translate(219.000000, 89.000000)"
+                  >
+                    <ellipse
+                      class="light"
+                      id="Oval"
+                      fill="#50F446"
+                      cx="10"
+                      cy="37.5"
+                      rx="10"
+                      ry="18.5"
+                    ></ellipse>
+                    <rect
+                      id="Rectangle"
+                      fill="#496E4C"
+                      x="2"
+                      y="4.26325641e-14"
+                      width="16"
+                      height="22"
+                      rx="4"
+                    ></rect>
+                  </g>
+                  <g
+                    id="Light1-Copy-2"
+                    stroke="none"
+                    stroke-width="1"
+                    fill="none"
+                    fill-rule="evenodd"
+                    transform="translate(329.000000, 117.000000) rotate(5.000000) translate(-329.000000, -117.000000) translate(319.000000, 89.000000)"
+                  >
+                    <ellipse
+                      class="light"
+                      id="Oval"
+                      fill="#FF9F19"
+                      cx="10"
+                      cy="37.5"
+                      rx="10"
+                      ry="18.5"
+                    ></ellipse>
+                    <rect
+                      id="Rectangle"
+                      fill="#496E4C"
+                      x="2"
+                      y="-7.10542736e-15"
+                      width="16"
+                      height="22"
+                      rx="4"
+                    ></rect>
+                  </g>
+                  <g
+                    id="Light1-Copy-3"
+                    stroke="none"
+                    stroke-width="1"
+                    fill="none"
+                    fill-rule="evenodd"
+                    transform="translate(429.000000, 117.000000) rotate(-2.000000) translate(-429.000000, -117.000000) translate(419.000000, 89.000000)"
+                  >
+                    <ellipse
+                      class="light"
+                      id="Oval"
+                      fill="#221DFF"
+                      cx="10"
+                      cy="37.5"
+                      rx="10"
+                      ry="18.5"
+                    ></ellipse>
+                    <rect
+                      id="Rectangle"
+                      fill="#496E4C"
+                      x="2"
+                      y="-1.42108547e-14"
+                      width="16"
+                      height="22"
+                      rx="4"
+                    ></rect>
+                  </g>
+                  <g
+                    id="Light1-Copy-4"
+                    stroke="none"
+                    stroke-width="1"
+                    fill="none"
+                    fill-rule="evenodd"
+                    transform="translate(529.000000, 117.000000) rotate(-9.000000) translate(-529.000000, -117.000000) translate(519.000000, 89.000000)"
+                  >
+                    <ellipse
+                      class="light"
+                      id="Oval"
+                      fill="#FFFFFF"
+                      cx="10"
+                      cy="37.5"
+                      rx="10"
+                      ry="18.5"
+                    ></ellipse>
+                    <rect
+                      id="Rectangle"
+                      fill="#496E4C"
+                      x="2"
+                      y="2.84217094e-14"
+                      width="16"
+                      height="22"
+                      rx="4"
+                    ></rect>
+                  </g>
+                  <g
+                    id="Light1-Copy-5"
+                    stroke="none"
+                    stroke-width="1"
+                    fill="none"
+                    fill-rule="evenodd"
+                    transform="translate(629.000000, 117.000000) rotate(18.000000) translate(-629.000000, -117.000000) translate(619.000000, 89.000000)"
+                  >
+                    <ellipse
+                      class="light"
+                      id="Oval"
+                      stroke="#F51F1F"
+                      fill="#FF3E3E"
+                      cx="10"
+                      cy="37.5"
+                      rx="10"
+                      ry="18.5"
+                    ></ellipse>
+                    <rect
+                      id="Rectangle"
+                      fill="#496E4C"
+                      x="2"
+                      y="-1.42108547e-14"
+                      width="16"
+                      height="22"
+                      rx="4"
+                    ></rect>
+                  </g>
+                  <g
+                    id="Light1-Copy-7"
+                    stroke="none"
+                    stroke-width="1"
+                    fill="none"
+                    fill-rule="evenodd"
+                    transform="translate(729.000000, 117.000000) rotate(3.000000) translate(-729.000000, -117.000000) translate(719.000000, 89.000000)"
+                  >
+                    <ellipse
+                      class="light"
+                      id="Oval"
+                      fill="#50F346"
+                      cx="10"
+                      cy="37.5"
+                      rx="10"
+                      ry="18.5"
+                    ></ellipse>
+                    <rect
+                      id="Rectangle"
+                      fill="#496E4C"
+                      x="2"
+                      y="2.13162821e-14"
+                      width="16"
+                      height="22"
+                      rx="4"
+                    ></rect>
+                  </g>
+                  <g
+                    id="Light1-Copy-6"
+                    stroke="none"
+                    stroke-width="1"
+                    fill="none"
+                    fill-rule="evenodd"
+                    transform="translate(829.000000, 117.000000) rotate(-13.000000) translate(-829.000000, -117.000000) translate(819.000000, 89.000000)"
+                  >
+                    <ellipse
+                      class="light"
+                      id="Oval"
+                      fill="#FF9F1A"
+                      cx="10"
+                      cy="37.5"
+                      rx="10"
+                      ry="18.5"
+                    ></ellipse>
+                    <rect
+                      id="Rectangle"
+                      fill="#496E4C"
+                      x="2"
+                      y="0"
+                      width="16"
+                      height="22"
+                      rx="4"
+                    ></rect>
+                  </g>
+                  <path
+                    d="M137,94 C137,94 213.5,102 227,95.5 C240.5,89 319,89.0008917 330.5,91.5 C342,93.9991083 423.5,99.5 431,92.5 C438.5,85.5 511,99.5 529,91 C547,82.5 635.5,96.5 635.5,96.5 C635.5,96.5 720,104 735,97.5 C750,91 826,96.5 826,96.5"
+                    id="Path-2"
+                    stroke="#496E4C"
+                    stroke-width="1"
+                    fill="none"
+                  ></path>
+                </svg>
+              </div>
+            </div>
+          </div>
+          <!-- ******************** -->
+          <div id="controls">
+            <div class="wrapper text-center">
+              <svg>
+                <text x="50%" y="40%" dy=".20em" text-anchor="middle">
+                  Hola! soy Rodolfina
+                </text>
+              </svg>
+            </div>
+
+            <button
+              id="recordButton"
+              onmousedown="startRecording()"
+              class="glow-on-hover"
+            >
+              Grabar audio
+            </button>
+            <!-- <button id="transcribeButton" disabled>Parar y reproducir respuesta</button> -->
+          </div>
+          <br />
+          <br />
+          <div><strong id="question"></strong></div>
+          <hr />
+          <div id="output"></div>
+        </div>
+      </div>
     </div>
-    <br/>
-    <br/>
-    <div><strong id="question"></strong></div><hr/>
-    <div id="output"></div>
+
+    <script src="script.js"></script>
+    <script defer src="src/preload.ts"></script>
     <script src="https://cdn.rawgit.com/mattdiamond/Recorderjs/08e7abd9/dist/recorder.js"></script>
+    <script
+      src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"
+      integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL"
+      crossorigin="anonymous"
+    ></script>
+
     <!-- <script defer src="src/renderer.ts"></script> -->
   </body>
 </html>

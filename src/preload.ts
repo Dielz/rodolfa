@@ -22,25 +22,55 @@ window.addEventListener("DOMContentLoaded", () => {
     dangerouslyAllowBrowser: true,
   });
 
+
   //const gtts = new TextToSpeechClient();
 
   let rec: MediaRecorder | null = null;
   let audioStream: MediaStream | null = null;
   let clicked: Boolean = false;
+  let firstTimer: string | number | NodeJS.Timeout;
 
-  const recordButton = document.getElementById("recordButton") as HTMLButtonElement;
-  
+
+  openModal();
+
+  const recordButton = document.getElementById("recordButton") as HTMLButtonElement;  
+  // recordButton.innerHTML = '<i class="fa fa-solid fa-microphone"></i> Grabar audio';
+
   recordButton.addEventListener("mousedown", start);
   recordButton.addEventListener("mouseup", stop);
   recordButton.addEventListener("mouseleave", stop);
 
+  // Llama a la función start directamente al cargar la página
+  function openModal() {
+    document.getElementById("startModal").style.display = "block";
+    // start();
+    firstTimer = setTimeout(() => {
+      closeModal();
+    }, 3000);
+  };
+
   function start() {
-    clicked = true;
+    clicked=true;
     startRecording();
   }
 
-  function stop() {
+  function closeModal() {
+    // Cierra el modal
+    document.getElementById("startModal").style.display = "none";
+    firstTimer = setTimeout(() => {
+      openModal();
+    },75000)
 
+  }
+
+  // Limpiar los temporizadores al cerrar o recargar la página
+  window.addEventListener("beforeunload", () => {
+    clearTimeout(firstTimer);
+  });
+
+
+
+  function stop() {
     if (clicked) {
       clicked = false;
       transcribeText();
@@ -49,14 +79,15 @@ window.addEventListener("DOMContentLoaded", () => {
 
   function startRecording() {
     const constraints: MediaStreamConstraints = { audio: true, video: false };
-
     navigator.mediaDevices.getUserMedia(constraints)
       .then(function (stream) {
         audioStream = stream;
         rec = new MediaRecorder(stream);
+        // Agregar clase "recording" al contenedor de los ojos
+        // document.querySelector('.eyes-container').classList.add('recording');
         rec.start();
-
-        document.getElementById("output").innerHTML = "Recording started...";
+        document.getElementById("output").innerHTML = ` <i class="fas fa-microphone"></i>  Recording started...`;
+    
       })
       .catch(function (err) {
         console.log(err);
@@ -64,7 +95,7 @@ window.addEventListener("DOMContentLoaded", () => {
   }
 
   function transcribeText() {
-    document.getElementById("output").innerHTML = "Converting audio to text...";
+    document.getElementById("output").innerHTML = `<i class="fas fa-regular fa-headphones"></i>  Converting audio to text...`;
 
     if (rec) {
       rec.stop();
@@ -171,6 +202,8 @@ window.addEventListener("DOMContentLoaded", () => {
 
     let transcript = transcriptG.text;
     document.getElementById("question").innerHTML = transcript;
+
+    // Abre los ojos después de la transcripción
     return transcript;
 
   }
@@ -191,6 +224,7 @@ window.addEventListener("DOMContentLoaded", () => {
 
     document.getElementById("output").innerHTML = completion.choices[0].text;
     return completion.choices[0].text;
+
   }
 
   async function createSpeech(text: string) {
@@ -251,3 +285,6 @@ window.addEventListener("DOMContentLoaded", () => {
   }
 
 });
+
+
+

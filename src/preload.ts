@@ -28,17 +28,13 @@ window.addEventListener("DOMContentLoaded", () => {
     apiKey: process.env.OPENAI_KEY,
     dangerouslyAllowBrowser: true,
   });
-
-
   //const gtts = new TextToSpeechClient();
 
   let rec: MediaRecorder | null = null;
   let audioStream: MediaStream | null = null;
   let clicked: Boolean = false;
   let firstTimer: string | number | NodeJS.Timeout;
-
-
-  openModal();
+  // openModal();
 
   const recordButton = document.getElementById("recordButton") as HTMLButtonElement;
   // recordButton.innerHTML = '<i class="fa fa-solid fa-microphone"></i> Grabar audio';
@@ -46,30 +42,16 @@ window.addEventListener("DOMContentLoaded", () => {
 
   recordButton.addEventListener("mousedown", start);
   recordButton.addEventListener("mouseup", stop);
-  recordButton.addEventListener("mouseleave", stop);
+  //recordButton.addEventListener("mouseleave", stop);
 
   // Llama a la función start directamente al cargar la página
   function openModal() {
-    document.getElementById("startModal").style.display = "block";
+    //  document.getElementById("startModal").style.display = "block";
     // start();
     firstTimer = setTimeout(() => {
       closeModal();
     }, 3000);
   };
-
-  function start() {
-
-    timer.style.display = 'block';
-    setTimeout(function () {
-
-      timer.style.display = 'none';
-
-    }, 3500);
-
-    // clicked = true;
-    // startRecording();
-
-  }
 
   function closeModal() {
     // Cierra el modal
@@ -80,6 +62,16 @@ window.addEventListener("DOMContentLoaded", () => {
 
   }
 
+  function start() {
+    // timer.style.display = 'block';
+    setTimeout(function () {
+      //  timer.style.display = 'none';
+    }, 3500);
+
+    clicked = true;
+    startRecording();
+  }
+
   // Limpiar los temporizadores al cerrar o recargar la página
   window.addEventListener("beforeunload", () => {
     clearTimeout(firstTimer);
@@ -87,7 +79,7 @@ window.addEventListener("DOMContentLoaded", () => {
 
 
   function stop() {
-    timer.style.display = 'none';
+    //timer.style.display = 'none';
     if (clicked) {
       clicked = false;
       transcribeText();
@@ -140,7 +132,6 @@ window.addEventListener("DOMContentLoaded", () => {
     let speech = await createSpeech(text);
 
     // play(speech);
-
     //postData(transcript, text, blob);
 
   }

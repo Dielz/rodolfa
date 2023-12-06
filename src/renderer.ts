@@ -1,9 +1,7 @@
-import { OpenAI } from "openai";
 import { TextToSpeechClient } from "@google-cloud/text-to-speech";
 import { google } from "@google-cloud/text-to-speech/build/protos/protos";
+import { OpenAI } from "openai";
 import * as path from "path";
-import * as fs from "fs";
-import * as util from "util";
 
 
 require('dotenv').config({ path: path.resolve(__dirname, '../.env') });

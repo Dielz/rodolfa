@@ -79,7 +79,7 @@ window.addEventListener("DOMContentLoaded", () => {
         // Agregar clase "recording" al contenedor de los ojos
         // document.querySelector('.eyes-container').classList.add('recording');
         rec.start();
-        document.getElementById("output").innerHTML = `<i class="fas fa-microphone"></i>  Grabando...`;
+        document.getElementById("output").innerHTML = `<div style="text-align: center;"><i class="fas fa-microphone"></i>  Grabando...</div>`;
 
       })
       .catch(function (err) {
@@ -88,7 +88,7 @@ window.addEventListener("DOMContentLoaded", () => {
   }
 
   function transcribeText() {
-    document.getElementById("output").innerHTML = `<i class="fas fa-regular fa-headphones"></i>  Pensando en una repuesta...`;
+    document.getElementById("output").innerHTML = `<div style="text-align: center;"><i class="fas fa-regular fa-headphones"></i>  Pensando en una repuesta...</div>`;
 
     if (rec) {
       rec.stop();
@@ -111,9 +111,9 @@ window.addEventListener("DOMContentLoaded", () => {
 
   async function transcript(blob: Blob) {
 
-     let transcript = await transcriptSpeech(blob);
-     let text = await answerQuestion(transcript);
-     let speech = await createSpeech(text);
+   //  let transcript = await transcriptSpeech(blob);
+    // let text = await answerQuestion(transcript);
+    // let speech = await createSpeech(text);
 
     // play(speech);
     //postData(transcript, text, blob);

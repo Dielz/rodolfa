@@ -79,7 +79,7 @@ window.addEventListener("DOMContentLoaded", () => {
         // Agregar clase "recording" al contenedor de los ojos
         // document.querySelector('.eyes-container').classList.add('recording');
         rec.start();
-        document.getElementById("output").innerHTML = `<div style="text-align: center;"><i class="fas fa-microphone" style="color:red;"></i>  Grabando...</div>`;
+        document.getElementById("output").innerHTML = `<div style="text-align: center;"><i class="fas fa-microphone" style="color:red;"></i>  Te estoy escuchando...</div>`;
 
       })
       .catch(function (err) {

@@ -79,7 +79,7 @@ window.addEventListener("DOMContentLoaded", () => {
         // Agregar clase "recording" al contenedor de los ojos
         // document.querySelector('.eyes-container').classList.add('recording');
         rec.start();
-        document.getElementById("output").innerHTML = `<div style="text-align: center;"><i class="fas fa-microphone"></i>  Grabando...</div>`;
+        document.getElementById("output").innerHTML = `<div style="text-align: center;"><i class="fas fa-microphone" style="color:red;"></i>  Grabando...</div>`;
 
       })
       .catch(function (err) {
@@ -88,7 +88,7 @@ window.addEventListener("DOMContentLoaded", () => {
   }
 
   function transcribeText() {
-    document.getElementById("output").innerHTML = `<div style="text-align: center;"><i class="fas fa-regular fa-headphones"></i>  Pensando en una repuesta...</div>`;
+    document.getElementById("output").innerHTML = `<div style="text-align: center;"><i class="fas fa-spinner fa-pulse" style="color:green;"></i>&nbsp; Pensando en una repuesta...</div>`;
 
     if (rec) {
       rec.stop();

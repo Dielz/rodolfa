@@ -207,7 +207,7 @@ a{
   animation: marquee linear infinite;
 }
 
-#marquee {
+#output {
   color: rgb(32, 31, 31);
 }
 

@@ -1,13 +1,67 @@
 import { OpenAI } from "openai";
 //import { TextToSpeechClient } from "@google-cloud/text-to-speech";
 //import { google } from "@google-cloud/text-to-speech/build/protos/protos";
-import { AudioConfig, CancellationDetails, CancellationReason, NoMatchDetails, ResultReason, SpeechConfig, SpeechRecognizer, SpeechSynthesizer } from "microsoft-cognitiveservices-speech-sdk";
-import * as path from "path";
+import axios from 'axios';
 import * as FormData from 'form-data';
-import fetch, { FetchError } from 'node-fetch';
-import axios, {
-  AxiosError, AxiosHeaders
-} from 'axios';
+import { SpeechConfig, SpeechSynthesizer } from "microsoft-cognitiveservices-speech-sdk";
+import * as path from "path";
+
+
+
+
+let pupils: any;
+let eyes: any;
+
+
+console.log('initialization');
+
+function addOrRemoveClass(className: string, add: boolean) {
+  eyes.forEach((el: HTMLElement) => {
+    if (add)
+      el.classList.add(className);
+    else
+      el.classList.remove(className);
+  })
+}
+
+function setEyeMovement(active: boolean) {
+  addOrRemoveClass('movement', active);
+  console.log('setEyeMovement');
+}
+
+function setAlmostClosedEyes(active: boolean) {
+  addOrRemoveClass('almost-closed', active);
+}
+
+function setBlink(active: boolean) {
+  addOrRemoveClass('blink', active);
+}
+
+function setThinking(active: boolean) {
+  if(active){
+    setEyeMovement(false);
+    setAlmostClosedEyes(false);
+  }
+
+  addOrRemoveClass('thinking', active)
+}
+
+
+function setIddle() {
+  setAlmostClosedEyes(false);
+  setEyeMovement(false);
+  setBlink(true);
+}
+
+setTimeout(() => {
+  pupils = document.querySelectorAll('.upper-pupil, .lower-pupil')
+  eyes = document.querySelectorAll('.eye');
+
+
+  setIddle();
+
+}, 3000);
+
 
 //import * as util from "util";
 export const API_URL =
@@ -53,7 +107,15 @@ window.addEventListener("DOMContentLoaded", () => {
     }, 3500);
 
     clicked = true;
+
+    setThinking(false);
+    setBlink(false);
+    setEyeMovement(true);
+    setAlmostClosedEyes(true);
+
     startRecording();
+
+
   }
 
   // Limpiar los temporizadores al cerrar o recargar la página
@@ -67,6 +129,18 @@ window.addEventListener("DOMContentLoaded", () => {
     if (clicked) {
       clicked = false;
       transcribeText();
+
+      setThinking(true);
+
+      setTimeout(() => {
+        setThinking(false);
+        setIddle();
+      }, 5000);
+      // setEyeMovement(false);
+      // setAlmostClosedEyes(false);
+      // setBlink(true);
+      // setIddle();
+
     }
   }
 
@@ -90,6 +164,7 @@ window.addEventListener("DOMContentLoaded", () => {
   function transcribeText() {
     document.getElementById("output").innerHTML = `<div style="text-align: center;"><i class="fas fa-spinner fa-pulse" style="color:green;"></i>&nbsp; Pensando en una repuesta...</div>`;
 
+
     if (rec) {
       rec.stop();
     }
@@ -111,7 +186,7 @@ window.addEventListener("DOMContentLoaded", () => {
 
   async function transcript(blob: Blob) {
 
-   //  let transcript = await transcriptSpeech(blob);
+    //  let transcript = await transcriptSpeech(blob);
     // let text = await answerQuestion(transcript);
     // let speech = await createSpeech(text);
 
@@ -218,12 +293,13 @@ window.addEventListener("DOMContentLoaded", () => {
       presence_penalty: 0,
     });
 
-    document.getElementById("output").innerHTML = '<marquee>'+completion.choices[0].text+'</marquee>';
+    document.getElementById("output").innerHTML = '<marquee>' + completion.choices[0].text + '</marquee>';
     return completion.choices[0].text;
 
   }
 
   async function createSpeech(text: string) {
+    setIddle();
     // microsoft ------------------------------------------------------------------------------------------------------------------------
     // Create the speech synthesizer.
     var synthesizer = new SpeechSynthesizer(speechConfig);

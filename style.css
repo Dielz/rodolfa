@@ -13,6 +13,11 @@ body {
 	background: #d58181;
 }
 
+a{
+  text-decoration: none;
+  text-decoration-color: black;
+
+}
 .eye {
 	width: 250px;
 	height: 250px;
@@ -198,7 +203,12 @@ body {
 #question {
   white-space: nowrap;
   overflow: hidden;
+  color: black;
   animation: marquee linear infinite;
+}
+
+#marquee {
+  color: rgb(32, 31, 31);
 }
 
 @keyframes marquee {

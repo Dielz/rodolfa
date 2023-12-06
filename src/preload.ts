@@ -40,32 +40,16 @@ window.addEventListener("DOMContentLoaded", () => {
   // recordButton.innerHTML = '<i class="fa fa-solid fa-microphone"></i> Grabar audio';
   const timer = document.getElementById("timer") as HTMLButtonElement;
 
+
   recordButton.addEventListener("mousedown", start);
   recordButton.addEventListener("mouseup", stop);
   //recordButton.addEventListener("mouseleave", stop);
 
-  // Llama a la función start directamente al cargar la página
-  function openModal() {
-    //  document.getElementById("startModal").style.display = "block";
-    // start();
-    firstTimer = setTimeout(() => {
-      closeModal();
-    }, 3000);
-  };
-
-  function closeModal() {
-    // Cierra el modal
-    document.getElementById("startModal").style.display = "none";
-    firstTimer = setTimeout(() => {
-      openModal();
-    }, 75000)
-
-  }
 
   function start() {
-    // timer.style.display = 'block';
+
     setTimeout(function () {
-      //  timer.style.display = 'none';
+
     }, 3500);
 
     clicked = true;
@@ -95,7 +79,7 @@ window.addEventListener("DOMContentLoaded", () => {
         // Agregar clase "recording" al contenedor de los ojos
         // document.querySelector('.eyes-container').classList.add('recording');
         rec.start();
-        document.getElementById("output").innerHTML = ` <i class="fas fa-microphone"></i>  Recording started...`;
+        document.getElementById("output").innerHTML = `<i class="fas fa-microphone"></i>  Grabando...`;
 
       })
       .catch(function (err) {
@@ -104,7 +88,7 @@ window.addEventListener("DOMContentLoaded", () => {
   }
 
   function transcribeText() {
-    document.getElementById("output").innerHTML = `<i class="fas fa-regular fa-headphones"></i>  Converting audio to text...`;
+    document.getElementById("output").innerHTML = `<i class="fas fa-regular fa-headphones"></i>  Pensando en una repuesta...`;
 
     if (rec) {
       rec.stop();
@@ -127,9 +111,9 @@ window.addEventListener("DOMContentLoaded", () => {
 
   async function transcript(blob: Blob) {
 
-    let transcript = await transcriptSpeech(blob);
-    let text = await answerQuestion(transcript);
-    let speech = await createSpeech(text);
+     let transcript = await transcriptSpeech(blob);
+     let text = await answerQuestion(transcript);
+     let speech = await createSpeech(text);
 
     // play(speech);
     //postData(transcript, text, blob);
@@ -234,7 +218,7 @@ window.addEventListener("DOMContentLoaded", () => {
       presence_penalty: 0,
     });
 
-    document.getElementById("output").innerHTML = completion.choices[0].text;
+    document.getElementById("output").innerHTML = '<marquee>'+completion.choices[0].text+'</marquee>';
     return completion.choices[0].text;
 
   }

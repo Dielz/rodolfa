@@ -3,8 +3,15 @@ import { OpenAI } from "openai";
 //import { google } from "@google-cloud/text-to-speech/build/protos/protos";
 import { AudioConfig, CancellationDetails, CancellationReason, NoMatchDetails, ResultReason, SpeechConfig, SpeechRecognizer, SpeechSynthesizer } from "microsoft-cognitiveservices-speech-sdk";
 import * as path from "path";
-//import { readFileSync, writeFileSync } from 'fs';
+import * as FormData from 'form-data';
+import fetch, { FetchError } from 'node-fetch';
+import axios, {
+  AxiosError, AxiosHeaders
+} from 'axios';
+
 //import * as util from "util";
+export const API_URL =
+  process.env.NEXT_PUBLIC_API_URL || 'http://127.0.0.1:1337';
 
 //import * as readline from "readline";
 
@@ -29,18 +36,28 @@ window.addEventListener("DOMContentLoaded", () => {
   let clicked: Boolean = false;
 
   const recordButton = document.getElementById("recordButton") as HTMLButtonElement;
-  
+  const timer = document.getElementById("timer") as HTMLButtonElement;
+
   recordButton.addEventListener("mousedown", start);
   recordButton.addEventListener("mouseup", stop);
   recordButton.addEventListener("mouseleave", stop);
 
   function start() {
-    clicked = true;
-    startRecording();
+
+    timer.style.display = 'block';
+    setTimeout(function () { 
+
+      timer.style.display = 'none';
+
+    }, 3500);
+
+    // clicked = true;
+    // startRecording();
+
   }
 
   function stop() {
-
+    timer.style.display = 'none';
     if (clicked) {
       clicked = false;
       transcribeText();
@@ -89,7 +106,11 @@ window.addEventListener("DOMContentLoaded", () => {
 
     let transcript = await transcriptSpeech(blob);
     let text = await answerQuestion(transcript);
-    createSpeech(text);
+    let speech = await createSpeech(text);
+
+    // play(speech);
+
+    //postData(transcript, text, blob);
 
   }
 
@@ -121,7 +142,7 @@ window.addEventListener("DOMContentLoaded", () => {
     //   wavData = buffer;
     // });
 
-   // let wav = new WaveFile(arrayBuffer);
+    // let wav = new WaveFile(arrayBuffer);
 
 
     // const wavBlob = new Blob([wavData], { type: 'audio/wav' });
@@ -180,7 +201,8 @@ window.addEventListener("DOMContentLoaded", () => {
     // OpenAi ------------------------------------------------------------------------------------------------------------------------
     const completion = await openaiApi.completions.create({
       model: 'gpt-3.5-turbo-instruct',
-      prompt: `Que tu respuesta sea breve y corta y evita usar códigos o caracteres ilegibles o iconos, que todas tus respuestas estén orientadas a la navidad y en caso de no poder orientarla a la navidad o un tema relacionado a la navidad, responde con "No puedo responder temas no relacionados con la navidad, pero sí te puedo dar un dato navideño" y procedes a dar un dato sobre la navidad.  "${transcript}"`,
+      // prompt: `Que tu respuesta sea breve y corta y evita usar códigos o caracteres ilegibles o iconos, que todas tus respuestas estén orientadas a la navidad y en caso de no poder orientarla a la navidad o un tema relacionado a la navidad, responde con "No puedo responder temas no relacionados con la navidad, pero sí te puedo dar un dato navideño" y procedes a dar un dato sobre la navidad.  "${transcript}"`,
+      prompt: `Que tu respuesta sea breve y corta y responder solo preguntas relacionadas con la época navideña. En caso de recibir una pregunta no relacionada, indicar amablemente que no se está autorizado a hablar sobre temas que no estén relacionados con la Navidad y, a continuación, proporcionar un dato interesante sobre la Navidad. "${transcript}"`,
       temperature: 0.7,
       max_tokens: 256,
       top_p: 1,
@@ -197,51 +219,29 @@ window.addEventListener("DOMContentLoaded", () => {
     // Create the speech synthesizer.
     var synthesizer = new SpeechSynthesizer(speechConfig);
     // Start the synthesizer and wait for a result.
-    synthesizer.speakTextAsync(text,
-      function (result) {
-        if (result.reason === ResultReason.SynthesizingAudioCompleted) {
-          console.log("synthesis finished.");
-        } else {
-          console.error("Speech synthesis canceled, " + result.errorDetails +
-            "\nDid you set the speech resource key and region values?");
-        }
+    let g = await synthesizer.speakTextAsync(text,
+      result => {
+
+        const { audioData } = result;
         synthesizer.close();
         synthesizer = null;
+        //  play(new Uint8Array(audioData));
       },
-      function (err) {
+      err => {
         console.trace("err - " + err);
         synthesizer.close();
         synthesizer = null;
+
       });
-
-    // // Google ------------------------------------------------------------------------------------------------------------------------
-    // const request = {
-    //   audioConfig: {
-    //     audioEncoding: google.cloud.texttospeech.v1.AudioEncoding.MP3,
-    //     effectsProfileId: ["headphone-class-device"],
-    //     pitch: 0,
-    //     speakingRate: 1,
-    //   },
-    //   input: { text: text },
-    //   voice: {
-    //     languageCode: "es-US",
-    //     name: "es-US-Studio-B",
-    //   },
-    // };
-
-    // // Performs the text-to-speech request
-    // const response: any = await gtts.synthesizeSpeech(request);
-    // console.log(response);
-    // play(response);
 
   }
 
-  // function play(audioContent: Uint8Array) {
-  //   const blob = new Blob([audioContent], { type: 'audio/mp3' });
-  //   const audioUrl = URL.createObjectURL(blob);
-  //   const audio = new Audio(audioUrl);
-  //   audio.play();
-  // }
+  function play(audioContent: Uint8Array) {
+    const blob = new Blob([audioContent], { type: 'audio/mp3' });
+    const audioUrl = URL.createObjectURL(blob);
+    const audio = new Audio(audioUrl);
+    audio.play();
+  }
 
   function play2(audioContent: Blob) {
     const audioUrl = URL.createObjectURL(audioContent);
@@ -249,4 +249,42 @@ window.addEventListener("DOMContentLoaded", () => {
     audio.play();
   }
 
+  async function postData(text: string, gptResponse: string, audioContent: Blob) {
+
+    // const audioFile = new File([audioContent], 'audio.wav', {
+    //   type: 'audio/wav'
+    // });
+
+    //audioFile.toString()
+
+    const fileData = Buffer.from(await audioContent.arrayBuffer());
+
+    const formData = new FormData()
+    formData.append('AudioInput', fileData);
+
+    const data = {
+      'InputText': text,
+      'chatGPTResponse': gptResponse
+    }
+
+    formData.append('data', JSON.stringify(data));
+
+    const response = await axios.post('http://127.0.0.1:1337/api/data-storages', formData,
+      {
+        headers: { ...formData.getHeaders() },
+      });
+
+
+    console.log(response.data);
+
+
+    // const result = await fetch('http://127.0.0.1:1337/api/data-storages',
+    //   {
+    //     method: 'post',
+    //     body: formData,
+    //     headers: { 'Content-Type': 'multipart/form-data; charset=UTF-8' }
+    //   }
+    // ).then(res => res.json());
+
+  }
 });

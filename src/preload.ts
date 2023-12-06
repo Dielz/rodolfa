@@ -29,23 +29,38 @@ window.addEventListener("DOMContentLoaded", () => {
     dangerouslyAllowBrowser: true,
   });
 
+
   //const gtts = new TextToSpeechClient();
 
   let rec: MediaRecorder | null = null;
   let audioStream: MediaStream | null = null;
   let clicked: Boolean = false;
+  let firstTimer: string | number | NodeJS.Timeout;
+
+
+  openModal();
 
   const recordButton = document.getElementById("recordButton") as HTMLButtonElement;
+  // recordButton.innerHTML = '<i class="fa fa-solid fa-microphone"></i> Grabar audio';
   const timer = document.getElementById("timer") as HTMLButtonElement;
 
   recordButton.addEventListener("mousedown", start);
   recordButton.addEventListener("mouseup", stop);
   recordButton.addEventListener("mouseleave", stop);
 
+  // Llama a la función start directamente al cargar la página
+  function openModal() {
+    document.getElementById("startModal").style.display = "block";
+    // start();
+    firstTimer = setTimeout(() => {
+      closeModal();
+    }, 3000);
+  };
+
   function start() {
 
     timer.style.display = 'block';
-    setTimeout(function () { 
+    setTimeout(function () {
 
       timer.style.display = 'none';
 
@@ -55,6 +70,21 @@ window.addEventListener("DOMContentLoaded", () => {
     // startRecording();
 
   }
+
+  function closeModal() {
+    // Cierra el modal
+    document.getElementById("startModal").style.display = "none";
+    firstTimer = setTimeout(() => {
+      openModal();
+    }, 75000)
+
+  }
+
+  // Limpiar los temporizadores al cerrar o recargar la página
+  window.addEventListener("beforeunload", () => {
+    clearTimeout(firstTimer);
+  });
+
 
   function stop() {
     timer.style.display = 'none';
@@ -66,14 +96,15 @@ window.addEventListener("DOMContentLoaded", () => {
 
   function startRecording() {
     const constraints: MediaStreamConstraints = { audio: true, video: false };
-
     navigator.mediaDevices.getUserMedia(constraints)
       .then(function (stream) {
         audioStream = stream;
         rec = new MediaRecorder(stream);
+        // Agregar clase "recording" al contenedor de los ojos
+        // document.querySelector('.eyes-container').classList.add('recording');
         rec.start();
+        document.getElementById("output").innerHTML = ` <i class="fas fa-microphone"></i>  Recording started...`;
 
-        document.getElementById("output").innerHTML = "Recording started...";
       })
       .catch(function (err) {
         console.log(err);
@@ -81,7 +112,7 @@ window.addEventListener("DOMContentLoaded", () => {
   }
 
   function transcribeText() {
-    document.getElementById("output").innerHTML = "Converting audio to text...";
+    document.getElementById("output").innerHTML = `<i class="fas fa-regular fa-headphones"></i>  Converting audio to text...`;
 
     if (rec) {
       rec.stop();
@@ -192,6 +223,8 @@ window.addEventListener("DOMContentLoaded", () => {
 
     let transcript = transcriptG.text;
     document.getElementById("question").innerHTML = transcript;
+
+    // Abre los ojos después de la transcripción
     return transcript;
 
   }
@@ -202,7 +235,7 @@ window.addEventListener("DOMContentLoaded", () => {
     const completion = await openaiApi.completions.create({
       model: 'gpt-3.5-turbo-instruct',
       // prompt: `Que tu respuesta sea breve y corta y evita usar códigos o caracteres ilegibles o iconos, que todas tus respuestas estén orientadas a la navidad y en caso de no poder orientarla a la navidad o un tema relacionado a la navidad, responde con "No puedo responder temas no relacionados con la navidad, pero sí te puedo dar un dato navideño" y procedes a dar un dato sobre la navidad.  "${transcript}"`,
-      prompt: `Que tu respuesta sea breve y corta y responder solo preguntas relacionadas con la época navideña. En caso de recibir una pregunta no relacionada, indicar amablemente que no se está autorizado a hablar sobre temas que no estén relacionados con la Navidad y, a continuación, proporcionar un dato interesante sobre la Navidad. "${transcript}"`,
+      prompt: `Actua como un experto en temas navideños, quiero que tu respuesta sea breve y corta, tu vas a responder solo preguntas relacionadas con la época navideña, en caso de no tener una repuesta, orienta tu repuesta con una tematica navideña explicando amablemente que solo sabes hablar sobre temas relacionados a la epoca navideña y en el proceso proporcionar un dato interesante sobre la Navidad, devuelveme el resultado en texto plano.  "${transcript}"`,
       temperature: 0.7,
       max_tokens: 256,
       top_p: 1,
@@ -212,6 +245,7 @@ window.addEventListener("DOMContentLoaded", () => {
 
     document.getElementById("output").innerHTML = completion.choices[0].text;
     return completion.choices[0].text;
+
   }
 
   async function createSpeech(text: string) {
@@ -288,3 +322,6 @@ window.addEventListener("DOMContentLoaded", () => {
 
   }
 });
+
+
+

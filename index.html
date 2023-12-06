@@ -1,25 +1,105 @@
 <!DOCTYPE html>
 <html>
-
-<head>
-    <meta charset="UTF-8">
+  <head>
+    <meta charset="UTF-8" />
     <title>Preguntale lo que quieras a Rodolfo!</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" type="text/css" href="https://bootswatch.com/4/cerulean/bootstrap.min.css">
-    <link rel="stylesheet" type="text/css" href="style.css">
-</head>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link
+      rel="stylesheet"
+      type="text/css"
+      href="https://bootswatch.com/4/cerulean/bootstrap.min.css"
+    />
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+      integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN"
+      crossorigin="anonymous"
+    />
+    <link rel="stylesheet" type="text/css" href="style.css" />
+    <!-- gooogle fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Open+Sans&display=swap"
+      rel="stylesheet"
+    />
+    <!---- Font Awesome Cdn Linkage ------>
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css"
+    />
+  </head>
+  <body>
+    <div class="container-fluid">
+      <div class="row">
+        <div class="col-md-12">
+          <!-- rudolf face -->
+          <button id="recordButton" class="button btn">
+            <!-- modal info-->
+            <div id="startModal" class="modal">
+              <div class="modal-content">
+                <h2>
+                  Presiona cualquier parte de la pantalla para empezar a hablar
+                  con Rodolfo
+                </h2>
+              </div>
+            </div>
 
-<body style="padding:50px;">
-    <h1>Preguntale lo que quieras a Rodolfo!</h1>
-    <div id="controls">
-        <button id="recordButton">Grabar audio</button>
-        <!-- <button id="transcribeButton" disabled>Parar y reproducir respuesta</button> -->
+            <!-- christmas hat -->
+            <div class="hat">
+              <div class="ribbon"></div>
+              <div class="hat-top">
+                <div>
+                  <strong style="font-size: 32px" id="question"></strong>
+                </div>
+              </div>
+              <div class="hat-bottom">
+                <marquee behavior="scroll" direction="left" scrollamount="5">
+                  <div style="font-size: 32px" id="output"></div>
+                </marquee>
+              </div>
+            </div>
+
+            <!-- Cejas -->
+            <div class="ceja ceja-right"></div>
+            <div class="ceja ceja-left"></div>
+
+            <!-- eyes -->
+            <div class="d-flex justify-content-center">
+              <div class="eye-right pe-5 me-3">
+                <svg viewBox="0 0 110 60" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+                  <g id="outer" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+                  <path d="M5.73 36.91C9.55 41.07 14.91 45.87 20.85 49.65 32.78 57.24 46.87 59.43 55.26 59.43 63.57 59.43 77.39 57.17 89.12 49.65 95.1 45.81 100.37 41.2 104.19 37.04 107.68 33.25 110 29.72 110 29.72 110 29.72 108.01 26.49 104.19 22.42 100.52 18.49 95.14 13.8 89.12 10.01 77.81 2.9 63.13 0 55.26 0 46.88 0 32.78 2.42 20.85 10.01 14.93 13.78 9.55 18.42 5.73 22.52 2.19 26.32 0 29.72 0 29.72 0 29.72 2.22 33.08 5.73 36.91Z" id="4" fill="#ffffff" transform="translate(55.000000, 29.715640) scale(-1, 1) translate(-55.000000, -29.715640) "/>
+                  <path d="M55.26 59.43C71.67 59.43 84.98 46.13 84.98 29.72 84.98 13.3 71.67 0 55.26 0 38.85 0 25.55 13.3 25.55 29.72 25.55 46.13 38.85 59.43 55.26 59.43Z" id="inner" fill="#6fa8dc"/>
+                  <circle id="inner" fill="#6fa8dc" cx="55.26" cy="29.72" r="22.42"/>
+                  <path d="M55.26 44.31C63.32 44.31 69.86 37.78 69.86 29.72 69.86 21.65 63.32 15.12 55.26 15.12 47.2 15.12 40.66 21.65 40.66 29.72 40.66 37.78 47.2 44.31 55.26 44.31Z" id="inner" fill="#333333"/>
+                </svg>
+            </div>
+            <div class="eye-left">
+                <svg viewBox="0 0 110 60" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+                  <g id="outer" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+                  <path d="M5.73 36.91C9.55 41.07 14.91 45.87 20.85 49.65 32.78 57.24 46.87 59.43 55.26 59.43 63.57 59.43 77.39 57.17 89.12 49.65 95.1 45.81 100.37 41.2 104.19 37.04 107.68 33.25 110 29.72 110 29.72 110 29.72 108.01 26.49 104.19 22.42 100.52 18.49 95.14 13.8 89.12 10.01 77.81 2.9 63.13 0 55.26 0 46.88 0 32.78 2.42 20.85 10.01 14.93 13.78 9.55 18.42 5.73 22.52 2.19 26.32 0 29.72 0 29.72 0 29.72 2.22 33.08 5.73 36.91Z" id="4" fill="#ffffff" transform="translate(55.000000, 29.715640) scale(-1, 1) translate(-55.000000, -29.715640) "/>
+                  <path d="M55.26 59.43C71.67 59.43 84.98 46.13 84.98 29.72 84.98 13.3 71.67 0 55.26 0 38.85 0 25.55 13.3 25.55 29.72 25.55 46.13 38.85 59.43 55.26 59.43Z" id="inner" fill="#6fa8dc"/>
+                  <circle id="inner" fill="#6fa8dc" cx="55.26" cy="29.72" r="22.42"/>
+                  <path d="M55.26 44.31C63.32 44.31 69.86 37.78 69.86 29.72 69.86 21.65 63.32 15.12 55.26 15.12 47.2 15.12 40.66 21.65 40.66 29.72 40.66 37.78 47.2 44.31 55.26 44.31Z" id="inner" fill="#333333"/>
+                </svg>  
+            </div>
+            </div>
+          </button>
+        </div>
+      </div>
     </div>
-    <br/>
-    <br/>
-    <div><strong id="question"></strong></div><hr/>
-    <div id="output"></div>
+
+    <!-- rudolf face -->
+
+    <!-- <script defer src="src/preload.ts"></script> -->
     <script src="https://cdn.rawgit.com/mattdiamond/Recorderjs/08e7abd9/dist/recorder.js"></script>
+    <script
+      src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"
+      integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL"
+      crossorigin="anonymous"
+    ></script>
+    <script src="script.js"></script>
     <!-- <script defer src="src/renderer.ts"></script> -->
   </body>
 </html>

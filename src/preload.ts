@@ -76,7 +76,7 @@ window.addEventListener("DOMContentLoaded", () => {
   const speechConfig = SpeechConfig.fromSubscription(process.env.SPEECH_KEY, process.env.SPEECH_REGION);
   speechConfig.speechRecognitionLanguage = "es-DO";
 
-  speechConfig.speechSynthesisVoiceName = "es-DO-RamonaNeural";
+  speechConfig.speechSynthesisVoiceName = "es-DO-EmilioNeural";
 
   const openaiApi = new OpenAI({
     apiKey: process.env.OPENAI_KEY,
@@ -132,10 +132,10 @@ window.addEventListener("DOMContentLoaded", () => {
 
       setThinking(true);
 
-      setTimeout(() => {
-        setThinking(false);
-        setIddle();
-      }, 5000);
+      // setTimeout(() => {
+      //   setThinking(false);
+      //   setIddle();
+      // }, 5000);
       // setEyeMovement(false);
       // setAlmostClosedEyes(false);
       // setBlink(true);
@@ -186,9 +186,9 @@ window.addEventListener("DOMContentLoaded", () => {
 
   async function transcript(blob: Blob) {
 
-    //  let transcript = await transcriptSpeech(blob);
-    // let text = await answerQuestion(transcript);
-    // let speech = await createSpeech(text);
+     let transcript = await transcriptSpeech(blob);
+     let text = await answerQuestion(transcript);
+     let speech = await createSpeech(text);
 
     // play(speech);
     //postData(transcript, text, blob);
@@ -299,7 +299,7 @@ window.addEventListener("DOMContentLoaded", () => {
   }
 
   async function createSpeech(text: string) {
-    setIddle();
+  
     // microsoft ------------------------------------------------------------------------------------------------------------------------
     // Create the speech synthesizer.
     var synthesizer = new SpeechSynthesizer(speechConfig);
@@ -307,6 +307,8 @@ window.addEventListener("DOMContentLoaded", () => {
     let g = await synthesizer.speakTextAsync(text,
       result => {
 
+        setThinking(false);
+        setIddle();
         const { audioData } = result;
         synthesizer.close();
         synthesizer = null;

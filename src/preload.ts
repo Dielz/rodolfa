@@ -3,10 +3,10 @@ import { OpenAI } from "openai";
 //import { google } from "@google-cloud/text-to-speech/build/protos/protos";
 import axios from 'axios';
 import * as FormData from 'form-data';
-import { SpeechConfig, SpeechSynthesizer } from "microsoft-cognitiveservices-speech-sdk";
+import {  AudioConfig, SpeechConfig, SpeechSynthesizer } from "microsoft-cognitiveservices-speech-sdk";
 import * as path from "path";
 
-
+import { processAudio } from './rpi-play';
 
 
 let pupils: any;
@@ -74,7 +74,9 @@ window.addEventListener("DOMContentLoaded", () => {
   require('dotenv').config({ path: path.resolve(__dirname, '../.env') });
 
   const speechConfig = SpeechConfig.fromSubscription(process.env.SPEECH_KEY, process.env.SPEECH_REGION);
+
   speechConfig.speechRecognitionLanguage = "es-DO";
+  // speechConfig.
 
   speechConfig.speechSynthesisVoiceName = "es-DO-EmilioNeural";
 
@@ -97,8 +99,9 @@ window.addEventListener("DOMContentLoaded", () => {
 
   recordButton.addEventListener("mousedown", start);
   recordButton.addEventListener("mouseup", stop);
+  // recordButton.addEventListener("touchstart", start);
+  // recordButton.addEventListener("touchend", stop);
   //recordButton.addEventListener("mouseleave", stop);
-
 
   function start() {
 
@@ -300,18 +303,27 @@ window.addEventListener("DOMContentLoaded", () => {
 
   async function createSpeech(text: string) {
   
+
+    const tmpAudioPath = path.join(__dirname, 'tmp.wav');
+
+    const audioConfig = AudioConfig.fromAudioFileOutput(tmpAudioPath);
+
     // microsoft ------------------------------------------------------------------------------------------------------------------------
     // Create the speech synthesizer.
-    var synthesizer = new SpeechSynthesizer(speechConfig);
+    var synthesizer = new SpeechSynthesizer(speechConfig, audioConfig);
     // Start the synthesizer and wait for a result.
+
     let g = await synthesizer.speakTextAsync(text,
       result => {
 
         setThinking(false);
         setIddle();
-        const { audioData } = result;
+        // const { audioData } = result;
         synthesizer.close();
         synthesizer = null;
+
+        processAudio(tmpAudioPath);
+        
         //  play(new Uint8Array(audioData));
       },
       err => {

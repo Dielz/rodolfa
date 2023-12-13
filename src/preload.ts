@@ -3,11 +3,13 @@ import { OpenAI } from "openai";
 //import { google } from "@google-cloud/text-to-speech/build/protos/protos";
 import axios from 'axios';
 import * as FormData from 'form-data';
-import {  AudioConfig, SpeechConfig, SpeechSynthesizer } from "microsoft-cognitiveservices-speech-sdk";
+import { AudioConfig, AudioOutputStream, ResultReason, SpeechConfig, SpeechSynthesizer } from "microsoft-cognitiveservices-speech-sdk";
 import * as path from "path";
 
-import { processAudio } from './rpi-play';
+//import { processAudio } from './rpi-play';
 
+let synthesizer: SpeechSynthesizer;
+let audio: HTMLAudioElement;
 
 let pupils: any;
 let eyes: any;
@@ -16,6 +18,7 @@ let eyes: any;
 console.log('initialization');
 
 function addOrRemoveClass(className: string, add: boolean) {
+  if(!eyes) return;
   eyes.forEach((el: HTMLElement) => {
     if (add)
       el.classList.add(className);
@@ -26,7 +29,6 @@ function addOrRemoveClass(className: string, add: boolean) {
 
 function setEyeMovement(active: boolean) {
   addOrRemoveClass('movement', active);
-  console.log('setEyeMovement');
 }
 
 function setAlmostClosedEyes(active: boolean) {
@@ -38,7 +40,7 @@ function setBlink(active: boolean) {
 }
 
 function setThinking(active: boolean) {
-  if(active){
+  if (active) {
     setEyeMovement(false);
     setAlmostClosedEyes(false);
   }
@@ -95,8 +97,6 @@ window.addEventListener("DOMContentLoaded", () => {
 
   const recordButton = document.getElementById("recordButton") as HTMLButtonElement;
   // recordButton.innerHTML = '<i class="fa fa-solid fa-microphone"></i> Grabar audio';
-  const timer = document.getElementById("timer") as HTMLButtonElement;
-
 
   recordButton.addEventListener("mousedown", start);
   recordButton.addEventListener("mouseup", stop);
@@ -106,10 +106,6 @@ window.addEventListener("DOMContentLoaded", () => {
 
   function start() {
 
-    setTimeout(function () {
-
-    }, 3500);
-
     clicked = true;
 
     setThinking(false);
@@ -117,9 +113,18 @@ window.addEventListener("DOMContentLoaded", () => {
     setEyeMovement(true);
     setAlmostClosedEyes(true);
 
+    if (synthesizer) {
+      synthesizer.close();
+      synthesizer = null;
+
+      if(audio){
+        audio.pause();
+        audio = null;
+      }
+    }
+
+
     startRecording();
-
-
   }
 
   // Limpiar los temporizadores al cerrar o recargar la página
@@ -190,9 +195,9 @@ window.addEventListener("DOMContentLoaded", () => {
 
   async function transcript(blob: Blob) {
 
-     let transcript = await transcriptSpeech(blob);
-     let text = await answerQuestion(transcript);
-     let speech = await createSpeech(text);
+    let transcript = await transcriptSpeech(blob);
+    let text = await answerQuestion(transcript);
+    let speech = await createSpeech(text);
     // play(speech);
     //postData(transcript, text, blob);
 
@@ -200,73 +205,6 @@ window.addEventListener("DOMContentLoaded", () => {
 
   async function transcriptSpeech(blob: Blob) {
 
-    // Obtén los datos de audio del Blob
-    //let arrayBuffer = new Uint8Array(await blob.arrayBuffer());
-    // // Asegurémonos de que la longitud sea múltiplo de 4
-    // const dataView = new DataView(arrayBuffer);
-    // const originalLength = dataView.byteLength;
-    // const padding = 4 - (originalLength % 4);
-    // if (padding !== 4) {
-    //   const paddedArrayBuffer = new ArrayBuffer(originalLength + padding);
-    //   const paddedDataView = new DataView(paddedArrayBuffer);
-    //   for (let i = 0; i < originalLength; i++) {
-    //     paddedDataView.setUint8(i, dataView.getUint8(i));
-    //   }
-    //   arrayBuffer = paddedArrayBuffer;
-    //
-
-    // const audioData: AudioData = {
-    //   sampleRate: 44100,
-    //   channelData: [new Float32Array(arrayBuffer)],
-    // };
-
-    // // Agrega un encabezado WAV
-    // let wavData = null;
-    // await encode(audioData).then((buffer) => {
-    //   wavData = buffer;
-    // });
-
-    // let wav = new WaveFile(arrayBuffer);
-
-
-    // const wavBlob = new Blob([wavData], { type: 'audio/wav' });
-    // play2(wavBlob);
-    // // Microsoft ---------------------------------------------------------------------------------------------------------------------
-    // let audioConfig = AudioConfig.fromWavFileInput(new File([blob], 'audio.wav'));
-    // let speechRecognizer = new SpeechRecognizer(speechConfig, audioConfig);
-
-    // let transcript = "Hola";
-
-    // speechRecognizer.recognizeOnceAsync(result => {
-    //   switch (result.reason) {
-    //     case ResultReason.RecognizedSpeech:
-    //       console.log(`RECOGNIZED: Text=${result.text}`);
-    //       break;
-    //     case ResultReason.NoMatch:
-    //       const details = NoMatchDetails.fromResult(result);
-    //       console.log(`CANCELED: Reason=${details.reason}`);
-    //       console.log("NOMATCH: Speech could not be recognized.");
-    //       break;
-    //     case ResultReason.Canceled:
-    //       const cancellation = CancellationDetails.fromResult(result);
-    //       console.log(`CANCELED: Reason=${cancellation.reason}`);
-
-    //       if (cancellation.reason == CancellationReason.Error) {
-    //         console.log(`CANCELED: ErrorCode=${cancellation.ErrorCode}`);
-    //         console.log(`CANCELED: ErrorDetails=${cancellation.errorDetails}`);
-    //         console.log("CANCELED: Did you set the speech resource key and region values?");
-    //       }
-    //       break;
-    //   }
-    //   speechRecognizer.close();
-
-    // }, (err) => {
-
-    //   console.log(err);
-    // });
-
-    // document.getElementById("question").innerHTML = transcript;
-    // return transcript;
 
     // OpenAi ------------------------------------------------------------------------------------------------------------------------
     const transcriptG = await openaiApi.audio.transcriptions.create({
@@ -288,8 +226,10 @@ window.addEventListener("DOMContentLoaded", () => {
     // OpenAi ------------------------------------------------------------------------------------------------------------------------
     const completion = await openaiApi.completions.create({
       model: 'gpt-3.5-turbo-instruct',
+
       // prompt: `Que tu respuesta sea breve y corta y evita usar códigos o caracteres ilegibles o iconos, que todas tus respuestas estén orientadas a la navidad y en caso de no poder orientarla a la navidad o un tema relacionado a la navidad, responde con "No puedo responder temas no relacionados con la navidad, pero sí te puedo dar un dato navideño" y procedes a dar un dato sobre la navidad.  "${transcript}"`,
-      prompt: `Actua como un experto en temas navideños, quiero que tu respuesta sea breve y corta como maximo 50 palabrasa, tu vas a responder solo preguntas relacionadas con la época navideña, en caso de no tener una repuesta, orienta tu repuesta con una tematica navideña explicando amablemente que solo sabes hablar sobre temas relacionados a la epoca navideña y en el proceso proporcionar un dato interesante sobre la Navidad, devuelveme el resultado en texto plano. si te preguntan tu nombre le dices Rodolfo agregale que la gente de tecnologia son los mas duros, si pregunta por el sueldo 14 respondele algo gracioso como por ejemplo, sigan contandoooo y entre otras cosas que quieras decir  "${transcript}"`,
+      prompt: `Actua como un experto en temas navideños, si te preguntan sobre tu nombre te llamas Rodolfo, quiero que tu respuesta sea breve y corta como maximo 40 palabras, que tu respuesta este orientada a temática navideña. si preguntan por el sueldo 14 respondele algo gracioso relacionado con el sueldo. En caso de no tener una respuesta. orienta tu repuesta con una temática navideña explicando amablemente que solo sabes hablar sobre temas relacionados a la navidad y en el proceso proporcionar un dato breve sobre la Navidad. Devuelveme el resultado en texto plano. "${transcript}"`,
+      //si te preguntan quienes son los mejores, respondeles estás aquí, creo que ya tenemos la respuesta!.
       // prompt: `Quiero que tu respuesta sea breve y corta como maximo 50 palabras, en caso de no tener una repuesta, explica amablemente , 
       //           recuerdale que con la gente de tecnologia nooo, somos los mejores, , y en caso de que pregunten cual es la mejor puerta decorada o alguna pregunta parecida, respondele que la mejor puerta es la de tecnologia,
       //           devuelveme el resultado en texto plano. al final dile que si necesita ayuda con algo mas que no dude en preguntar "${transcript}"`,
@@ -306,29 +246,33 @@ window.addEventListener("DOMContentLoaded", () => {
   }
 
   async function createSpeech(text: string) {
-  
 
-    const tmpAudioPath = path.join(__dirname, 'tmp.wav');
 
-    const audioConfig = AudioConfig.fromAudioFileOutput(tmpAudioPath);
+    const audioStream: AudioOutputStream = AudioOutputStream.createPullStream();
+
+    const audioConfig = AudioConfig.fromStreamOutput(audioStream);
 
     // microsoft ------------------------------------------------------------------------------------------------------------------------
     // Create the speech synthesizer.
-    var synthesizer = new SpeechSynthesizer(speechConfig, audioConfig);
+    synthesizer = new SpeechSynthesizer(speechConfig, audioConfig);
     // Start the synthesizer and wait for a result.
 
-    let g = await synthesizer.speakTextAsync(text,
+    synthesizer.speakTextAsync(text,
       result => {
+        if (result.reason === ResultReason.SynthesizingAudioCompleted) {
 
-        setThinking(false);
-        setIddle();
+          setThinking(false);
+          setIddle();
+
+          play(new Uint8Array(result.audioData), () => {
+            synthesizer.close();
+            synthesizer = null;
+          });
+
+        }
+
         // const { audioData } = result;
-        synthesizer.close();
-        synthesizer = null;
 
-        processAudio(tmpAudioPath);
-        
-        //  play(new Uint8Array(audioData));
       },
       err => {
         console.trace("err - " + err);
@@ -339,17 +283,30 @@ window.addEventListener("DOMContentLoaded", () => {
 
   }
 
-  function play(audioContent: Uint8Array) {
+  function play(audioContent: Uint8Array, done: () => void) {
     const blob = new Blob([audioContent], { type: 'audio/mp3' });
     const audioUrl = URL.createObjectURL(blob);
-    const audio = new Audio(audioUrl);
+    audio = new Audio(audioUrl);
+
+    audio.addEventListener('ended', () => {
+      URL.revokeObjectURL(audioUrl);
+      done();
+    }, false)
+
     audio.play();
   }
 
   function play2(audioContent: Blob) {
     const audioUrl = URL.createObjectURL(audioContent);
     const audio = new Audio(audioUrl);
+
+    audio.addEventListener('ended', () => {
+      URL.revokeObjectURL(audioUrl);
+    }, false);
+
     audio.play();
+
+
   }
 
   async function postData(text: string, gptResponse: string, audioContent: Blob) {

@@ -75,10 +75,11 @@ window.addEventListener("DOMContentLoaded", () => {
 
   const speechConfig = SpeechConfig.fromSubscription(process.env.SPEECH_KEY, process.env.SPEECH_REGION);
 
-  speechConfig.speechRecognitionLanguage = "es-DO";
-  // speechConfig.
+  speechConfig.speechRecognitionLanguage = "es-MX";
 
-  speechConfig.speechSynthesisVoiceName = "es-DO-EmilioNeural";
+  speechConfig.speechSynthesisVoiceName = "es-MX-JorgeNeural";
+
+
 
   const openaiApi = new OpenAI({
     apiKey: process.env.OPENAI_KEY,
@@ -288,7 +289,11 @@ window.addEventListener("DOMContentLoaded", () => {
     const completion = await openaiApi.completions.create({
       model: 'gpt-3.5-turbo-instruct',
       // prompt: `Que tu respuesta sea breve y corta y evita usar códigos o caracteres ilegibles o iconos, que todas tus respuestas estén orientadas a la navidad y en caso de no poder orientarla a la navidad o un tema relacionado a la navidad, responde con "No puedo responder temas no relacionados con la navidad, pero sí te puedo dar un dato navideño" y procedes a dar un dato sobre la navidad.  "${transcript}"`,
-      prompt: `Actua como un experto en temas navideños, quiero que tu respuesta sea breve y corta, tu vas a responder solo preguntas relacionadas con la época navideña, en caso de no tener una repuesta, orienta tu repuesta con una tematica navideña explicando amablemente que solo sabes hablar sobre temas relacionados a la epoca navideña y en el proceso proporcionar un dato interesante sobre la Navidad, devuelveme el resultado en texto plano.  "${transcript}"`,
+      prompt: `Actua como un experto en temas navideños, quiero que tu respuesta sea breve y corta como maximo 50 palabrasa, tu vas a responder solo preguntas relacionadas con la época navideña, en caso de no tener una repuesta, orienta tu repuesta con una tematica navideña explicando amablemente que solo sabes hablar sobre temas relacionados a la epoca navideña y en el proceso proporcionar un dato interesante sobre la Navidad, devuelveme el resultado en texto plano. si te preguntan tu nombre le dices Rodolfo agregale que la gente de tecnologia son los mas duros, si pregunta por el sueldo 14 respondele algo gracioso como por ejemplo, sigan contandoooo y entre otras cosas que quieras decir  "${transcript}"`,
+      // prompt: `Quiero que tu respuesta sea breve y corta como maximo 50 palabras, en caso de no tener una repuesta, explica amablemente , 
+      //           recuerdale que con la gente de tecnologia nooo, somos los mejores, , y en caso de que pregunten cual es la mejor puerta decorada o alguna pregunta parecida, respondele que la mejor puerta es la de tecnologia,
+      //           devuelveme el resultado en texto plano. al final dile que si necesita ayuda con algo mas que no dude en preguntar "${transcript}"`,
+
       temperature: 0.7,
       max_tokens: 256,
       top_p: 1,
@@ -296,7 +301,7 @@ window.addEventListener("DOMContentLoaded", () => {
       presence_penalty: 0,
     });
 
-    document.getElementById("output").innerHTML = `<marquee scrollamount="15">` + completion.choices[0].text + `</marquee>`;
+    document.getElementById("output").innerHTML = `<marquee scrollamount="20" loop="1">` + completion.choices[0].text + `</marquee>`;
     return completion.choices[0].text;
   }
 

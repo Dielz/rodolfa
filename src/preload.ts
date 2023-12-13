@@ -192,7 +192,6 @@ window.addEventListener("DOMContentLoaded", () => {
      let transcript = await transcriptSpeech(blob);
      let text = await answerQuestion(transcript);
      let speech = await createSpeech(text);
-
     // play(speech);
     //postData(transcript, text, blob);
 
@@ -277,6 +276,7 @@ window.addEventListener("DOMContentLoaded", () => {
     let transcript = transcriptG.text;
     document.getElementById("question").innerHTML = transcript;
 
+
     // Abre los ojos después de la transcripción
     return transcript;
 
@@ -296,9 +296,8 @@ window.addEventListener("DOMContentLoaded", () => {
       presence_penalty: 0,
     });
 
-    document.getElementById("output").innerHTML = '<marquee>' + completion.choices[0].text + '</marquee>';
+    document.getElementById("output").innerHTML = `<marquee scrollamount="15">` + completion.choices[0].text + `</marquee>`;
     return completion.choices[0].text;
-
   }
 
   async function createSpeech(text: string) {

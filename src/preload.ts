@@ -6,6 +6,8 @@ import * as FormData from 'form-data';
 import { AudioConfig, AudioOutputStream, ResultReason, SpeechConfig, SpeechSynthesizer } from "microsoft-cognitiveservices-speech-sdk";
 import * as path from "path";
 
+import { spawn } from 'node:child_process';
+
 //import { processAudio } from './rpi-play';
 
 let synthesizer: SpeechSynthesizer;
@@ -14,11 +16,12 @@ let audio: HTMLAudioElement;
 let pupils: any;
 let eyes: any;
 
+let wavingEars: boolean = false;
 
 console.log('initialization');
 
 function addOrRemoveClass(className: string, add: boolean) {
-  if(!eyes) return;
+  if (!eyes) return;
   eyes.forEach((el: HTMLElement) => {
     if (add)
       el.classList.add(className);
@@ -48,6 +51,17 @@ function setThinking(active: boolean) {
   addOrRemoveClass('thinking', active)
 }
 
+function waveEars(): Promise<any> {
+  wavingEars = true;
+
+  return new Promise((resolve, reject) => {
+
+    const ears = spawn('python', [path.join(__dirname, 'wave-ears.py')]);
+
+    ears.on('close', resolve);
+    ears.stderr.on('data', reject);
+  })
+}
 
 function setIddle() {
   setAlmostClosedEyes(false);
@@ -117,7 +131,7 @@ window.addEventListener("DOMContentLoaded", () => {
       synthesizer.close();
       synthesizer = null;
 
-      if(audio){
+      if (audio) {
         audio.pause();
         audio = null;
       }
@@ -256,6 +270,9 @@ window.addEventListener("DOMContentLoaded", () => {
     // Create the speech synthesizer.
     synthesizer = new SpeechSynthesizer(speechConfig, audioConfig);
     // Start the synthesizer and wait for a result.
+
+    if (!wavingEars)
+      waveEars().then(() => wavingEars = false, err => wavingEars = false);
 
     synthesizer.speakTextAsync(text,
       result => {
